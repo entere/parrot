@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package com.island.code.srv.auth;
+
+service Auth {
+	rpc MakeAccessToken (MakeTokenRequest) returns (MakeTokenResponse) {}
+	rpc DelUserAccessToken (DelTokenRequest) returns (DelTokenResponse) {}
+	rpc QueryUserByName(QueryUserRequest) returns (QueryUserResponse) {}
+}
+
+message MakeTokenRequest {
+	string userID = 1;
+	string fingerprint = 3;
+}
+message MakeTokenResponse {
+	Error error = 1;
+	MakeTokenData data = 2;
+}
+
+
+message MakeTokenData {
+	string token = 1;
+}
+message DelTokenRequest {
+	string token = 1;
+}
+message DelTokenResponse {
+	Error error = 1;
+}
+
+
+message QueryUserData {
+	string userID = 1;
+	string loginName = 2;
+	string loginPwd = 3;
+	string token = 4;
+	string deviceID = 5; //登录设备id
+}
+message QueryUserRequest {
+	string loginName = 1;
+//	string loginPwd = 2;
+//	string deviceID = 3; //登录设备id
+}
+message QueryUserResponse {
+	Error error = 1;
+	QueryUserData data = 2;
+}
+
+
+message Error{
+	int32 code = 1;
+	string msg = 2;
+}

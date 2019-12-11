@@ -1,0 +1,11 @@
+app:
+  redis:
+    enabled: true
+    conn: 127.0.0.1:6379
+    dbNum: 0
+    password: "123456"
+    timeout: 3000
+    sentinel:
+      enabled: false
+      master: codeislandMaster
+      nodes: 127.0.0.1:16379,127.0.0.1:26379,127.0.0.1:36379

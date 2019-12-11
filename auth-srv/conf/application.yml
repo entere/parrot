@@ -1,0 +1,7 @@
+app:
+  jwt:
+    secretKey: W6VjDud2W1kMG3BicbMNlGgI4ZfcoHtMGLWr
+    # jwt存活时间 2592000秒 = 30天
+    # ttl: 2592000
+  profiles:
+    include: etcd, redis, db
