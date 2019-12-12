@@ -4,22 +4,26 @@ import (
 	"fmt"
 	"github.com/entere/parrot/auth-srv/handler"
 	"github.com/entere/parrot/auth-srv/model"
+	"go.uber.org/zap"
 
+	auth "github.com/entere/parrot/auth-srv/proto/auth"
 	"github.com/entere/parrot/basic"
 	"github.com/entere/parrot/basic/config"
+	z "github.com/entere/parrot/basic/zap"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/registry/etcd"
-	"github.com/micro/go-micro/util/log"
+)
 
-	auth "github.com/entere/parrot/auth-srv/proto/auth"
+var (
+	log *z.Logger
 )
 
 func main() {
 	// 初始化配置、数据库等信息
 	basic.Init()
-
+	log = z.GetLogger()
 	// 使用etcd注册
 	micReg := etcd.NewRegistry(registryOptions)
 	// New Service
@@ -50,7 +54,8 @@ func main() {
 
 	// 服务启动
 	if err := service.Run(); err != nil {
-		log.Fatal(err)
+		// log.Fatal(err)
+		log.Fatal("[main] service run err", zap.Any("err", err))
 	}
 }
 func registryOptions(ops *registry.Options) {

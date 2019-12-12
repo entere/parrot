@@ -2,12 +2,12 @@ package auth
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"time"
 
 	"github.com/dgrijalva/jwt-go"
 	"github.com/entere/parrot/basic/config"
 	"github.com/micro/go-micro/broker"
-	"github.com/micro/go-micro/util/log"
 )
 
 var (
@@ -80,9 +80,9 @@ func (s *service) DelUserAccessToken(tk string) (err error) {
 		Body: []byte(claims.Subject),
 	}
 	if err := broker.Publish(tokenExpiredTopic, msg); err != nil {
-		log.Logf("[pub] 发布token删除消息失败： %v", err)
+		log.Error("[pub] 发布token删除消息失败", zap.Any("err", err))
 	} else {
-		fmt.Println("[pub] 发布token删除消息：", string(msg.Body))
+		log.Info("[pub] 发布token删除消息成功", zap.String("msg:", string(msg.Body)))
 	}
 
 	return

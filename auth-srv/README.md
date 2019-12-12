@@ -54,11 +54,17 @@ make docker
 
 ## 调用服务
 
-```
+1、micro call 调用
 
-micro --registry etcd list services
+```
 micro --registry etcd  call com.island.code.srv.auth Auth.MakeAccessToken '{"userID":"543987654"}'
 micro --registry etcd  call com.island.code.srv.auth Auth.DelUserAccessToken '{"token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Nzg1NTg1OTQsImp0aSI6IjU0Mzk4NzY1NCIsImlhdCI6MTU3NTk2NjU5NCwiaXNzIjoiY29tLmlzbGFuZC5jb2RlIiwibmJmIjoxNTc1OTY2NTk0LCJzdWIiOiI1NDM5ODc2NTQifQ.jcxGnEFbIcSG48FU-WG72X-hE7aYsNNl83TGI6F716A"}'
 micro --registry etcd  call com.island.code.srv.auth Auth.QueryUserByName '{"loginName":"entere"}'
 
 ```
+
+2、curl 直接调用服务
+
+通过/rpc这个固定url可以绕过rpc处理器直接对服务进行访问，例如
+
+

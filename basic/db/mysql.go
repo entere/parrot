@@ -3,7 +3,6 @@ package db
 import (
 	"database/sql"
 	"github.com/entere/parrot/basic/config"
-
 	"github.com/micro/go-micro/util/log"
 )
 
@@ -13,7 +12,7 @@ func initMysql() {
 	// 创建连接
 	mysqlDB, err = sql.Open("mysql", config.GetMysqlConfig().GetURL())
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("[sql.Open] mysql连接失败")
 		panic(err)
 	}
 
@@ -25,6 +24,6 @@ func initMysql() {
 
 	// 激活链接
 	if err = mysqlDB.Ping(); err != nil {
-		log.Fatal(err)
+		log.Fatal("[mysqlDB.Ping] mysql激活链接失败")
 	}
 }

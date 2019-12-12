@@ -4,14 +4,16 @@ import (
 	"fmt"
 	auth "github.com/entere/parrot/auth-srv/proto/auth"
 	"github.com/entere/parrot/basic/redis"
+	z "github.com/entere/parrot/basic/zap"
 	r "github.com/go-redis/redis"
 	"sync"
 )
 
 var (
-	s  *service
-	ca *r.Client
-	m  sync.RWMutex
+	s   *service
+	ca  *r.Client
+	m   sync.RWMutex
+	log *z.Logger
 )
 
 // service 服务
@@ -50,6 +52,7 @@ func Init() {
 	}
 
 	ca = redis.GetRedis()
+	log = z.GetLogger()
 
 	s = &service{}
 }

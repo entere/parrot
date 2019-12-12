@@ -4,17 +4,23 @@ import (
 	"fmt"
 	"github.com/entere/parrot/basic"
 	"github.com/entere/parrot/basic/config"
+	z "github.com/entere/parrot/basic/zap"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/registry/etcd"
-	"github.com/micro/go-micro/util/log"
+	"go.uber.org/zap"
 
 	"github.com/entere/parrot/auth-web/handler"
 	"github.com/micro/go-micro/web"
 )
 
+var (
+	log *z.Logger
+)
+
 func main() {
 	basic.Init()
+	log = z.GetLogger()
 	micReg := etcd.NewRegistry(registryOptions)
 	// create new web service
 	service := web.NewService(
@@ -31,7 +37,7 @@ func main() {
 
 		}),
 	); err != nil {
-		log.Fatal(err)
+		log.Fatal("[server.Init] err", zap.Any("err", err))
 	}
 
 	// register html handler
@@ -43,7 +49,7 @@ func main() {
 
 	// run service
 	if err := service.Run(); err != nil {
-		log.Fatal(err)
+		log.Fatal("[server.Run] err", zap.Any("err", err))
 	}
 }
 func registryOptions(ops *registry.Options) {

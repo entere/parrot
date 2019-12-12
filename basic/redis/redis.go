@@ -2,10 +2,10 @@ package redis
 
 import (
 	"github.com/entere/parrot/basic/config"
+	"github.com/micro/go-micro/util/log"
 	"sync"
 
 	"github.com/go-redis/redis"
-	"github.com/micro/go-micro/util/log"
 )
 
 var (
@@ -20,7 +20,7 @@ func Init() {
 	defer m.Unlock()
 
 	if inited {
-		log.Log("已经初始化过Redis...")
+		log.Warn("[Init] 已经初始化过Redis...")
 		return
 	}
 
@@ -28,27 +28,25 @@ func Init() {
 
 	// 打开才加载
 	if redisConfig != nil && redisConfig.GetEnabled() {
-		log.Log("初始化Redis...")
+		log.Info("[Init] 初始化Redis...")
 
 		// 加载哨兵模式
 		if redisConfig.GetSentinelConfig() != nil && redisConfig.GetSentinelConfig().GetEnabled() {
-			log.Log("初始化Redis，哨兵模式...")
+			log.Info("[Init] 初始化Redis，哨兵模式...")
 			initSentinel(redisConfig)
 		} else { // 普通模式
-			log.Log("初始化Redis，普通模式...")
+			log.Info("[Init] 初始化Redis，普通模式...")
 			initSingle(redisConfig)
 		}
-
-		log.Log("初始化Redis，检测连接...")
+		log.Info("[Init] 初始化Redis，检测连接...")
 
 		pong, err := client.Ping().Result()
 		if err != nil {
 			log.Fatal(err.Error())
 		}
+		log.Info("[Init] 初始化Redis，检测连接Ping")
+		log.Info("[Init] 初始化Redis，检测连接Ping...", pong)
 
-		log.Log("初始化Redis，检测连接Ping.")
-		log.Log("初始化Redis，检测连接Ping..")
-		log.Logf("初始化Redis，检测连接Ping... %s", pong)
 	}
 }
 

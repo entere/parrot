@@ -3,7 +3,8 @@ package handler
 import (
 	"context"
 	"encoding/json"
-	"github.com/micro/go-micro/util/log"
+	z "github.com/entere/parrot/basic/zap"
+	"go.uber.org/zap"
 	"net/http"
 	"time"
 
@@ -13,9 +14,11 @@ import (
 
 var (
 	authClient auth.AuthService
+	log        *z.Logger
 )
 
 func Init() {
+	log = z.GetLogger()
 	authClient = auth.NewAuthService("com.island.code.srv.auth", client.DefaultClient)
 }
 
@@ -27,7 +30,7 @@ type Error struct {
 func Login(w http.ResponseWriter, r *http.Request) {
 
 	if r.Method != "POST" {
-		log.Logf("非法请求")
+		log.Error("[Login] 非法请求", zap.Any("ip", r.RemoteAddr))
 		http.Error(w, "非法请求", 400)
 		return
 	}
@@ -36,8 +39,9 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	rsp, err := authClient.QueryUserByName(context.TODO(), &auth.QueryUserRequest{
 		LoginName: r.Form.Get("loginName"),
 	})
-	log.Log(rsp)
+
 	if err != nil {
+		log.Error("[QueryUserByName] 查询用户失败", zap.Any("err", err))
 		http.Error(w, err.Error(), 500)
 	}
 
@@ -50,7 +54,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 			UserID: rsp.Data.UserID,
 		})
 		if err != nil {
-			log.Logf("[Login] 创建token失败，err：%s", err)
+			log.Error("[MakeAccessToken] 创建token失败", zap.Any("err", err))
 			http.Error(w, err.Error(), 500)
 			return
 		}
@@ -92,14 +96,14 @@ func Login(w http.ResponseWriter, r *http.Request) {
 func Logout(w http.ResponseWriter, r *http.Request) {
 	// 只接受POST请求
 	if r.Method != "POST" {
-		log.Logf("非法请求")
+		log.Error("[Logout] 非法请求", zap.Any("ip", r.RemoteAddr))
 		http.Error(w, "非法请求", 400)
 		return
 	}
 
 	tokenCookie, err := r.Cookie("remember-me-token")
 	if err != nil {
-		log.Logf("token获取失败")
+		log.Error("[r.Cookie] tokenCookie获取失败", zap.Any("err", err))
 		http.Error(w, "非法请求", 400)
 		return
 	}

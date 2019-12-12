@@ -2,11 +2,10 @@ package db
 
 import (
 	"database/sql"
-	"fmt"
 	"github.com/entere/parrot/basic/config"
-	"sync"
-
 	"github.com/micro/go-micro/util/log"
+
+	"sync"
 )
 
 var (
@@ -19,12 +18,9 @@ var (
 func Init() {
 	m.Lock()
 	defer m.Unlock()
-
-	var err error
-
 	if inited {
-		err = fmt.Errorf("[Init] db 已经初始化过")
-		log.Logf(err.Error())
+
+		log.Warn("[Init] 已经初始化过db...")
 		return
 	}
 
@@ -32,7 +28,7 @@ func Init() {
 	if config.GetMysqlConfig().GetEnabled() {
 		initMysql()
 	}
-
+	// log.Info("[Init] 初始化db...")
 	inited = true
 }
 
