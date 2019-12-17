@@ -1,6 +1,6 @@
 app:
   jwt:
-    secretKey: W6VjDud2W1kMG3BicbMNlGgI4ZfcoHtMGLWr
+    secretKey: XsX20LwAEeUQpCcXcmbzt0yI0x0sObUQ
     # jwt存活时间 2592000秒 = 30天
     # ttl: 2592000
   profiles:

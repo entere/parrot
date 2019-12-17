@@ -2,11 +2,10 @@ package auth
 
 import (
 	"fmt"
+	"github.com/entere/parrot/basic/token"
 	"go.uber.org/zap"
 	"time"
 
-	"github.com/dgrijalva/jwt-go"
-	"github.com/entere/parrot/basic/config"
 	"github.com/micro/go-micro/broker"
 )
 
@@ -22,25 +21,18 @@ var (
 
 // Subject token 持有者
 type Subject struct {
-	ID string `json:"id"`
+	UserID   string `json:"userID"`
+	DeviceID string `json:"deviceID"`
 }
 
 // MakeAccessToken 生成token并保存到redis
-func (s *service) MakeAccessToken(subject *Subject) (ret string, err error) {
-	m, err := s.createTokenClaims(subject)
+func (s *service) MakeAccessToken(subject *Subject) (tk string, err error) {
+	tk, err = token.GenerateToken(subject.UserID, subject.DeviceID)
 	if err != nil {
-		return "", fmt.Errorf("[MakeAccessToken] 创建token Claim 失败，err: %s", err)
+		log.Error("[token.GenerateToken] error", zap.Any("err", err))
 	}
-
-	// 创建
-	token := jwt.NewWithClaims(jwt.SigningMethodHS256, m)
-	ret, err = token.SignedString([]byte(config.GetJwtConfig().GetSecretKey()))
-	if err != nil {
-		return "", fmt.Errorf("[MakeAccessToken] 创建token失败，err: %s", err)
-	}
-
 	// 保存到redis
-	err = s.saveTokenToCache(subject, ret)
+	err = s.saveTokenToCache(subject, tk)
 	if err != nil {
 		return "", fmt.Errorf("[MakeAccessToken] 保存token到缓存失败，err: %s", err)
 	}
@@ -61,14 +53,14 @@ func (s *service) GetCachedAccessToken(subject *Subject) (ret string, err error)
 // DelUserAccessToken 清除用户token
 func (s *service) DelUserAccessToken(tk string) (err error) {
 	// 解析token字符串
-	claims, err := s.parseToken(tk)
+	claims, err := token.ParseToken(tk)
 	if err != nil {
 		return fmt.Errorf("[DelUserAccessToken] 错误的token，err: %s", err)
 	}
 
 	// 通过解析到的用户id删除
 	err = s.delTokenFromCache(&Subject{
-		ID: claims.Subject,
+		UserID: claims.Subject,
 	})
 
 	if err != nil {

@@ -32,7 +32,8 @@ func (s *Service) MakeAccessToken(ctx context.Context, req *auth.MakeTokenReques
 
 	token, err := authService.MakeAccessToken(&am.Subject{
 		// ID:   strconv.FormatInt(req.UserID, 10),
-		ID: req.UserID,
+		UserID:   req.UserID,
+		DeviceID: req.DeviceID,
 	})
 	if err != nil {
 		rsp.Error = &auth.Error{
@@ -72,9 +73,10 @@ func (s *Service) DelUserAccessToken(ctx context.Context, req *auth.DelTokenRequ
 }
 
 // GetCachedAccessToken 获取缓存的token
-func (s *Service) GetCachedAccessToken(ctx context.Context, req *auth.MakeTokenRequest, rsp *auth.MakeTokenResponse) error {
+func (s *Service) GetCachedAccessToken(ctx context.Context, req *auth.GetCachedTokenRequest, rsp *auth.GetCachedTokenResponse) error {
 	token, err := authService.GetCachedAccessToken(&am.Subject{
-		ID: req.UserID,
+		UserID:   req.UserID,
+		DeviceID: req.DeviceID,
 	})
 	if err != nil {
 		rsp.Error = &auth.Error{
@@ -87,9 +89,9 @@ func (s *Service) GetCachedAccessToken(ctx context.Context, req *auth.MakeTokenR
 
 	rsp.Error = &auth.Error{
 		Code: 200,
-		Msg:  "success",
+		Msg:  "Success",
 	}
-	rsp.Data = &auth.MakeTokenData{
+	rsp.Data = &auth.GetCachedTokenData{
 		Token: token,
 	}
 	return nil

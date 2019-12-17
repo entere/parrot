@@ -1,0 +1,26 @@
+syntax = "proto3";
+
+package com.island.code.srv.user;
+
+service User {
+	rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
+
+}
+
+
+
+message UpdatePasswordRequest {
+	string userID = 1;
+	string password = 2;
+
+}
+message UpdatePasswordResponse {
+	Error error = 1;
+}
+
+
+message Error{
+	int32 code = 1;
+	string msg = 2;
+}
+

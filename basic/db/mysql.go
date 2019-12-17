@@ -12,7 +12,7 @@ func initMysql() {
 	// 创建连接
 	mysqlDB, err = sql.Open("mysql", config.GetMysqlConfig().GetURL())
 	if err != nil {
-		log.Fatal("[sql.Open] mysql连接失败")
+		log.Fatalf("[sql.Open] mysql连接失败", err)
 		panic(err)
 	}
 

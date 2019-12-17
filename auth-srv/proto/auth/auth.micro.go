@@ -36,6 +36,7 @@ var _ server.Option
 type AuthService interface {
 	MakeAccessToken(ctx context.Context, in *MakeTokenRequest, opts ...client.CallOption) (*MakeTokenResponse, error)
 	DelUserAccessToken(ctx context.Context, in *DelTokenRequest, opts ...client.CallOption) (*DelTokenResponse, error)
+	GetCachedAccessToken(ctx context.Context, in *GetCachedTokenRequest, opts ...client.CallOption) (*GetCachedTokenResponse, error)
 	QueryUserByName(ctx context.Context, in *QueryUserRequest, opts ...client.CallOption) (*QueryUserResponse, error)
 }
 
@@ -77,6 +78,16 @@ func (c *authService) DelUserAccessToken(ctx context.Context, in *DelTokenReques
 	return out, nil
 }
 
+func (c *authService) GetCachedAccessToken(ctx context.Context, in *GetCachedTokenRequest, opts ...client.CallOption) (*GetCachedTokenResponse, error) {
+	req := c.c.NewRequest(c.name, "Auth.GetCachedAccessToken", in)
+	out := new(GetCachedTokenResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *authService) QueryUserByName(ctx context.Context, in *QueryUserRequest, opts ...client.CallOption) (*QueryUserResponse, error) {
 	req := c.c.NewRequest(c.name, "Auth.QueryUserByName", in)
 	out := new(QueryUserResponse)
@@ -92,6 +103,7 @@ func (c *authService) QueryUserByName(ctx context.Context, in *QueryUserRequest,
 type AuthHandler interface {
 	MakeAccessToken(context.Context, *MakeTokenRequest, *MakeTokenResponse) error
 	DelUserAccessToken(context.Context, *DelTokenRequest, *DelTokenResponse) error
+	GetCachedAccessToken(context.Context, *GetCachedTokenRequest, *GetCachedTokenResponse) error
 	QueryUserByName(context.Context, *QueryUserRequest, *QueryUserResponse) error
 }
 
@@ -99,6 +111,7 @@ func RegisterAuthHandler(s server.Server, hdlr AuthHandler, opts ...server.Handl
 	type auth interface {
 		MakeAccessToken(ctx context.Context, in *MakeTokenRequest, out *MakeTokenResponse) error
 		DelUserAccessToken(ctx context.Context, in *DelTokenRequest, out *DelTokenResponse) error
+		GetCachedAccessToken(ctx context.Context, in *GetCachedTokenRequest, out *GetCachedTokenResponse) error
 		QueryUserByName(ctx context.Context, in *QueryUserRequest, out *QueryUserResponse) error
 	}
 	type Auth struct {
@@ -118,6 +131,10 @@ func (h *authHandler) MakeAccessToken(ctx context.Context, in *MakeTokenRequest,
 
 func (h *authHandler) DelUserAccessToken(ctx context.Context, in *DelTokenRequest, out *DelTokenResponse) error {
 	return h.AuthHandler.DelUserAccessToken(ctx, in, out)
+}
+
+func (h *authHandler) GetCachedAccessToken(ctx context.Context, in *GetCachedTokenRequest, out *GetCachedTokenResponse) error {
+	return h.AuthHandler.GetCachedAccessToken(ctx, in, out)
 }
 
 func (h *authHandler) QueryUserByName(ctx context.Context, in *QueryUserRequest, out *QueryUserResponse) error {
