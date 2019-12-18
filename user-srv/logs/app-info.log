@@ -1,4 +1,0 @@
-{"level":"info","ts":1576163044.976175,"caller":"zap/zap.go:49","msg":"[initLogger] zap plugin initializing completed"}
-{"level":"info","ts":1576488518.8205729,"caller":"zap/zap.go:49","msg":"[initLogger] zap plugin initializing completed"}
-{"level":"info","ts":1576542878.6039848,"caller":"zap/zap.go:49","msg":"[initLogger] zap plugin initializing completed"}
-{"level":"info","ts":1576543612.254604,"caller":"zap/zap.go:49","msg":"[initLogger] zap plugin initializing completed"}
