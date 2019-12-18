@@ -62,6 +62,13 @@ message QueryUserResponse {
 }
 
 
+message LogoutEvent {
+	string id = 1;
+	int64 sentTime = 2;
+	string userID = 3;
+}
+
+
 message Error{
 	int32 code = 1;
 	string msg = 2;

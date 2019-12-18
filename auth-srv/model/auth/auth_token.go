@@ -5,8 +5,6 @@ import (
 	"github.com/entere/parrot/basic/token"
 	"go.uber.org/zap"
 	"time"
-
-	"github.com/micro/go-micro/broker"
 )
 
 var (
@@ -68,14 +66,18 @@ func (s *service) DelUserAccessToken(tk string) (err error) {
 	}
 
 	// 广播删除
-	msg := &broker.Message{
-		Body: []byte(claims.Subject),
-	}
-	if err := broker.Publish(tokenExpiredTopic, msg); err != nil {
-		log.Error("[pub] 发布token删除消息失败", zap.Any("err", err))
-	} else {
-		log.Info("[pub] 发布token删除消息成功", zap.String("msg:", string(msg.Body)))
-	}
+
+	//msg := &broker.Message{
+	//	Body: []byte(claims.Subject),
+	//}
+	//if err := broker.Publish(tokenExpiredTopic, msg); err != nil {
+	//	log.Error("[pub] 发布token删除消息失败", zap.Any("err", err))
+	//} else {
+	//	log.Info("[pub] 发布token删除消息成功", zap.String("msg:", string(msg.Body)))
+	//}
+
+	// 广播删除
+	s.sendLogoutEvent(claims.Subject)
 
 	return
 }

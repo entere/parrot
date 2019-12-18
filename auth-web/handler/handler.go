@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"github.com/entere/parrot/basic/common"
 	z "github.com/entere/parrot/basic/zap"
 	"github.com/entere/parrot/pkg/rest"
 	"go.uber.org/zap"
@@ -75,11 +76,12 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	w.Header().Add("Access-Control-Allow-Methords", "GET,POST,OPTIONS,HEAD,PUT,DELETE")
 	w.Header().Add("Access-Control-Expose-Headers", "Set-Cookie")
 	w.Header().Add("set-cookie", "application/json; charset=utf-8")
-	rest.Response(w, "Success", 200, rsp.Data)
 
 	expire := time.Now().Add(30 * time.Minute)
-	cookie := http.Cookie{Name: "remember-me-token", Value: rsp2.Data.Token, Path: "/", Expires: expire, MaxAge: 90000}
+	cookie := http.Cookie{Name: common.CookieNameRememberMe, Value: rsp2.Data.Token, Path: "/", Expires: expire, MaxAge: 90000}
 	http.SetCookie(w, &cookie)
+
+	rest.Response(w, "Success", 200, rsp.Data)
 
 }
 
@@ -92,7 +94,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	tokenCookie, err := r.Cookie("remember-me-token")
+	tokenCookie, err := r.Cookie(common.CookieNameRememberMe)
 	if err != nil {
 		log.Warn("[r.Cookie] tokenCookie获取失败", zap.Any("err", err))
 		rest.Error(w, "非法请求", 400)
@@ -109,7 +111,7 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// 清除cookie
-	cookie := http.Cookie{Name: "remember-me-token", Value: "", Path: "/", Expires: time.Now().Add(0 * time.Second), MaxAge: 0}
+	cookie := http.Cookie{Name: common.CookieNameRememberMe, Value: "", Path: "/", Expires: time.Now().Add(0 * time.Second), MaxAge: 0}
 	http.SetCookie(w, &cookie)
 
 	rest.Success(w, nil)

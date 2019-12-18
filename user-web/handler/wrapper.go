@@ -58,7 +58,8 @@ func JWTAuthWrapper(h http.Handler) http.Handler {
 			return
 		}
 
-		//w.Header().Add("userID", claims.Subject)
+		r.Header.Set("X-UserID", claims.Subject)
+
 		h.ServeHTTP(w, r)
 	})
 }

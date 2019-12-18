@@ -3,10 +3,12 @@ package main
 import (
 	"fmt"
 	"github.com/entere/parrot/basic"
+	"github.com/entere/parrot/basic/common"
 	"github.com/entere/parrot/basic/config"
 	z "github.com/entere/parrot/basic/zap"
 	"github.com/entere/parrot/user-srv/handler"
 	"github.com/entere/parrot/user-srv/model"
+	"github.com/entere/parrot/user-srv/subscriber"
 	"github.com/micro/cli"
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
@@ -40,8 +42,13 @@ func main() {
 			model.Init()
 			// 初始化handler
 			handler.Init()
+			// 初始化sub
+			subscriber.Init()
 		}),
 	)
+
+	// 注册事件
+	micro.RegisterSubscriber(common.TopicLogout, service.Server(), subscriber.LogoutLog)
 
 	// Register Handler
 	user.RegisterUserHandler(service.Server(), new(handler.Service))

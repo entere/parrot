@@ -3,17 +3,21 @@ package auth
 import (
 	"fmt"
 	auth "github.com/entere/parrot/auth-srv/proto/auth"
+	"github.com/entere/parrot/basic/common"
 	"github.com/entere/parrot/basic/redis"
 	z "github.com/entere/parrot/basic/zap"
 	r "github.com/go-redis/redis"
+	"github.com/micro/go-micro"
+	"github.com/micro/go-micro/client"
 	"sync"
 )
 
 var (
-	s   *service
-	ca  *r.Client
-	m   sync.RWMutex
-	log *z.Logger
+	s               *service
+	ca              *r.Client
+	m               sync.RWMutex
+	log             *z.Logger
+	logoutPublisher micro.Publisher
 )
 
 // service 服务
@@ -53,6 +57,8 @@ func Init() {
 
 	ca = redis.GetRedis()
 	log = z.GetLogger()
+
+	logoutPublisher = micro.NewPublisher(common.TopicLogout, client.DefaultClient)
 
 	s = &service{}
 }
