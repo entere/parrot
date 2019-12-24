@@ -34,7 +34,10 @@ var _ server.Option
 // Client API for User service
 
 type UserService interface {
-	UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, opts ...client.CallOption) (*UpdatePasswordResponse, error)
+	// 获取用户详情
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*GetUserResponse, error)
+	// 更新用户
+	UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error)
 }
 
 type userService struct {
@@ -55,9 +58,19 @@ func NewUserService(name string, c client.Client) UserService {
 	}
 }
 
-func (c *userService) UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, opts ...client.CallOption) (*UpdatePasswordResponse, error) {
-	req := c.c.NewRequest(c.name, "User.UpdatePassword", in)
-	out := new(UpdatePasswordResponse)
+func (c *userService) GetUser(ctx context.Context, in *GetUserRequest, opts ...client.CallOption) (*GetUserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.GetUser", in)
+	out := new(GetUserResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userService) UpdateUser(ctx context.Context, in *UpdateUserRequest, opts ...client.CallOption) (*UpdateUserResponse, error) {
+	req := c.c.NewRequest(c.name, "User.UpdateUser", in)
+	out := new(UpdateUserResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -68,12 +81,16 @@ func (c *userService) UpdatePassword(ctx context.Context, in *UpdatePasswordRequ
 // Server API for User service
 
 type UserHandler interface {
-	UpdatePassword(context.Context, *UpdatePasswordRequest, *UpdatePasswordResponse) error
+	// 获取用户详情
+	GetUser(context.Context, *GetUserRequest, *GetUserResponse) error
+	// 更新用户
+	UpdateUser(context.Context, *UpdateUserRequest, *UpdateUserResponse) error
 }
 
 func RegisterUserHandler(s server.Server, hdlr UserHandler, opts ...server.HandlerOption) error {
 	type user interface {
-		UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, out *UpdatePasswordResponse) error
+		GetUser(ctx context.Context, in *GetUserRequest, out *GetUserResponse) error
+		UpdateUser(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error
 	}
 	type User struct {
 		user
@@ -86,6 +103,10 @@ type userHandler struct {
 	UserHandler
 }
 
-func (h *userHandler) UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, out *UpdatePasswordResponse) error {
-	return h.UserHandler.UpdatePassword(ctx, in, out)
+func (h *userHandler) GetUser(ctx context.Context, in *GetUserRequest, out *GetUserResponse) error {
+	return h.UserHandler.GetUser(ctx, in, out)
+}
+
+func (h *userHandler) UpdateUser(ctx context.Context, in *UpdateUserRequest, out *UpdateUserResponse) error {
+	return h.UserHandler.UpdateUser(ctx, in, out)
 }

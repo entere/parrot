@@ -97,17 +97,20 @@ func (s *Service) GetCachedAccessToken(ctx context.Context, req *auth.GetCachedT
 	return nil
 }
 
-// QueryUserByName
-func (s *Service) QueryUserByName(ctx context.Context, req *auth.QueryUserRequest, rsp *auth.QueryUserResponse) error {
+// LoginByName
+func (s *Service) LoginByName(ctx context.Context, req *auth.LoginByNameRequest, rsp *auth.LoginByNameResponse) error {
 	var code int32
-	user, err := authService.QueryUserByName(req.LoginName)
+	user, err := authService.LoginByName(req)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			code = 404
-			log.Info("[QueryUserByName] 查询数据不存在 loginName:"+req.LoginName, zap.Any("err", err))
+			log.Info("[LoginByName] 用户名不存在 loginName:"+req.LoginName, zap.Any("err", err))
+		} else if err.Error() == "密码错误" {
+			code = 403
+			log.Warn("[LoginByName] 密码错误 loginName:"+req.LoginName, zap.Any("err", err))
 		} else {
 			code = 500
-			log.Error("[QueryUserByName] 查询失败 loginName:"+req.LoginName, zap.Any("err", err))
+			log.Warn("[LoginByName] 查询失败 loginName:"+req.LoginName, zap.Any("err", err))
 		}
 		rsp.Error = &auth.Error{
 			Code: code,
@@ -120,5 +123,24 @@ func (s *Service) QueryUserByName(ctx context.Context, req *auth.QueryUserReques
 		Msg:  "success",
 	}
 	rsp.Data = user
+	return nil
+}
+
+func (s *Service) UpdatePassword(ctx context.Context, req *auth.UpdatePasswordRequest, rsp *auth.UpdatePasswordResponse) error {
+
+	err := authService.UpdatePassword(req.Password, req.UserID)
+	if err != nil {
+
+		rsp.Error = &auth.Error{
+			Code: 500,
+			Msg:  err.Error(),
+		}
+		return err
+	}
+	rsp.Error = &auth.Error{
+		Code: 200,
+		Msg:  "Success",
+	}
+
 	return nil
 }

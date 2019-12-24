@@ -35,7 +35,8 @@ type Service interface {
 	// DelUserAccessToken 清除用户token
 	DelUserAccessToken(token string) (err error)
 
-	QueryUserByName(loginName string) (ret *auth.QueryUserData, err error)
+	LoginByName(req *auth.LoginByNameRequest) (ret *auth.LoginByNameData, err error)
+	UpdatePassword(password string, userID string) (err error)
 }
 
 // GetService 获取服务类

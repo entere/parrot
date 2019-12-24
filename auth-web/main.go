@@ -9,6 +9,7 @@ import (
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/registry/etcd"
 	"go.uber.org/zap"
+	"net/http"
 
 	"github.com/entere/parrot/auth-web/handler"
 	"github.com/micro/go-micro/web"
@@ -46,6 +47,10 @@ func main() {
 	// register call handler
 	service.HandleFunc("/auth/login", handler.Login)
 	service.HandleFunc("/auth/logout", handler.Logout)
+	service.HandleFunc("/auth/password/modify", handler.UpdatePassword)
+
+	updatePasswordHandler := http.HandlerFunc(handler.UpdatePassword)
+	service.Handle("/auth/password/update", handler.JWTAuthWrapper(updatePasswordHandler))
 
 	// run service
 	if err := service.Run(); err != nil {

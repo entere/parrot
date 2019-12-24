@@ -3,21 +3,39 @@ syntax = "proto3";
 package com.island.code.srv.user;
 
 service User {
-	rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
+	// 获取用户详情
+	rpc GetUser(GetUserRequest) returns (GetUserResponse) {}
+	// 更新用户
+	rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {}
+
 
 }
 
-
-
-message UpdatePasswordRequest {
+message UpdateUserRequest {
 	string userID = 1;
-	string password = 2;
-
+	string mobile = 2;
+	string avatarURL = 3;
 }
-message UpdatePasswordResponse {
+message UpdateUserResponse {
 	Error error = 1;
+	GetUserData data = 2;
+
 }
 
+message GetUserRequest {
+	string userID = 1;
+}
+message GetUserResponse {
+	Error error = 1;
+	GetUserData data = 2;
+
+}
+
+message GetUserData {
+	string userID = 1;
+	string mobile = 2;
+	string avatarURL = 3;
+}
 
 message Error{
 	int32 code = 1;

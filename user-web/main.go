@@ -19,6 +19,7 @@ var (
 )
 
 func main() {
+
 	basic.Init()
 	log = z.GetLogger()
 	micReg := etcd.NewRegistry(registryOptions)
@@ -40,13 +41,10 @@ func main() {
 		log.Fatal("[server.Init] err", zap.Any("err", err))
 	}
 
-	// register html handler
-	// service.Handle("/", http.FileServer(http.Dir("html")))
+	service.Handle("/user/update", handler.JWTAuthWrapper(http.HandlerFunc(handler.UpdateUser)))
+	service.Handle("/user/info", handler.JWTAuthWrapper(http.HandlerFunc(handler.GetUser)))
 
-	updatePasswordHandler := http.HandlerFunc(handler.UpdatePassword)
-	service.Handle("/password/update", handler.JWTAuthWrapper(updatePasswordHandler))
-
-	service.HandleFunc("/password/modify", handler.UpdatePassword)
+	service.HandleFunc("/user/info1", handler.GetUser)
 
 	// run service
 	if err := service.Run(); err != nil {

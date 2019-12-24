@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/entere/parrot/auth-srv/handler"
 	"github.com/entere/parrot/auth-srv/model"
+	"github.com/micro/go-plugins/broker/grpc"
 	"go.uber.org/zap"
 
 	auth "github.com/entere/parrot/auth-srv/proto/auth"
@@ -21,6 +22,11 @@ var (
 )
 
 func main() {
+	//使用grpc作为broker
+	b := grpc.NewBroker()
+	b.Init()
+	b.Connect()
+
 	// 初始化配置、数据库等信息
 	basic.Init()
 	log = z.GetLogger()
@@ -31,6 +37,7 @@ func main() {
 		micro.Name("com.island.code.srv.auth"),
 		micro.Registry(micReg),
 		micro.Version("latest"),
+		micro.Broker(b),
 	)
 
 	// 服务初始化

@@ -5,7 +5,7 @@ import (
 
 	"github.com/entere/parrot/basic/redis"
 	z "github.com/entere/parrot/basic/zap"
-	// user "github.com/entere/parrot/user-srv/proto/user"
+	user "github.com/entere/parrot/user-srv/proto/user"
 	r "github.com/go-redis/redis"
 	"sync"
 )
@@ -23,7 +23,8 @@ type service struct {
 
 // Service 用户服务类
 type Service interface {
-	UpdatePassword(password string, userID string) (err error)
+	GetUser(userID string) (ret *user.GetUserData, err error)
+	UpdateUser(req *user.UpdateUserRequest) (err error)
 }
 
 // GetService 获取服务类

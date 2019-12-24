@@ -13,6 +13,7 @@ import (
 	"github.com/micro/go-micro"
 	"github.com/micro/go-micro/registry"
 	"github.com/micro/go-micro/registry/etcd"
+	"github.com/micro/go-plugins/broker/grpc"
 	"go.uber.org/zap"
 
 	user "github.com/entere/parrot/user-srv/proto/user"
@@ -23,6 +24,11 @@ var (
 )
 
 func main() {
+	//使用grpc作为broker
+	b := grpc.NewBroker()
+	b.Init()
+	b.Connect()
+
 	// 初始化配置、数据库等信息
 	basic.Init()
 	log = z.GetLogger()
@@ -33,6 +39,7 @@ func main() {
 		micro.Name("com.island.code.srv.user"),
 		micro.Registry(micReg),
 		micro.Version("latest"),
+		micro.Broker(b),
 	)
 
 	// 服务初始化

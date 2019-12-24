@@ -37,21 +37,20 @@ func Login(w http.ResponseWriter, r *http.Request) {
 	}
 	r.ParseForm()
 
-	rsp, err := authClient.QueryUserByName(context.TODO(), &auth.QueryUserRequest{
+	rsp, err := authClient.LoginByName(context.TODO(), &auth.LoginByNameRequest{
 		LoginName: r.Form.Get("loginName"),
+		LoginPwd:  r.Form.Get("loginPwd"),
+		DeviceID:  r.Form.Get("deviceID"),
 	})
 
 	if err != nil {
-		log.Error("[QueryUserByName] 查询用户失败", zap.Any("err", err))
-		rest.Error(w, err.Error(), 500)
+		log.Warn("[authClient.LoginByName]用户登录失败", zap.Any("err", err))
+		rest.Error(w, rsp.Error.Msg, rsp.Error.Code)
+		return
 	}
 
 	response := map[string]interface{}{
 		"ref": time.Now().UnixNano(),
-	}
-	if rsp.Data.LoginPwd != r.Form.Get("loginPwd") {
-		rest.Error(w, "密码错误", 403)
-		return
 	}
 
 	rsp2, err := authClient.MakeAccessToken(context.TODO(), &auth.MakeTokenRequest{
@@ -130,4 +129,28 @@ func Logout(w http.ResponseWriter, r *http.Request) {
 	//	http.Error(w, err.Error(), 500)
 	//	return
 	//}
+}
+
+func UpdatePassword(w http.ResponseWriter, r *http.Request) {
+
+	if r.Method != "POST" {
+		log.Warn("[Login] 非法请求", zap.Any("ip", r.RemoteAddr))
+		rest.Error(w, "非法请求", 400)
+		return
+	}
+	r.ParseForm()
+
+	rsp, err := authClient.UpdatePassword(context.TODO(), &auth.UpdatePasswordRequest{
+		Password: r.Form.Get("password"),
+		UserID:   r.Form.Get("userID"),
+		// LoginName: r.Form.Get("loginName"),
+	})
+
+	if err != nil {
+		log.Error("[UpdatePassword] 修改密码失败", zap.Any("err", err))
+		rest.Error(w, err.Error(), 500)
+	}
+
+	rest.Response(w, rsp.Error.Msg, rsp.Error.Code, nil)
+
 }

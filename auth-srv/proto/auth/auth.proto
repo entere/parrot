@@ -6,7 +6,10 @@ service Auth {
 	rpc MakeAccessToken (MakeTokenRequest) returns (MakeTokenResponse) {}
 	rpc DelUserAccessToken (DelTokenRequest) returns (DelTokenResponse) {}
 	rpc GetCachedAccessToken (GetCachedTokenRequest) returns (GetCachedTokenResponse) {}
-	rpc QueryUserByName(QueryUserRequest) returns (QueryUserResponse) {}
+	// 使用用户名密码登录
+	rpc LoginByName(LoginByNameRequest) returns (LoginByNameResponse) {}
+	// 更新密码
+	rpc UpdatePassword(UpdatePasswordRequest) returns (UpdatePasswordResponse) {}
 }
 
 message MakeTokenRequest {
@@ -44,21 +47,32 @@ message GetCachedTokenData {
 }
 
 
-message QueryUserData {
+message LoginByNameData {
 	string userID = 1;
 	string loginName = 2;
 	string loginPwd = 3;
 	string token = 4;
 	string deviceID = 5; //登录设备id
 }
-message QueryUserRequest {
+message LoginByNameRequest {
 	string loginName = 1;
-//	string loginPwd = 2;
-//	string deviceID = 3; //登录设备id
+	string loginPwd = 2;
+	string deviceID = 3; //登录设备id
 }
-message QueryUserResponse {
+message LoginByNameResponse {
 	Error error = 1;
-	QueryUserData data = 2;
+	LoginByNameData data = 2;
+}
+
+
+
+message UpdatePasswordRequest {
+	string userID = 1;
+	string password = 2;
+
+}
+message UpdatePasswordResponse {
+	Error error = 1;
 }
 
 

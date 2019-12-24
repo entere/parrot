@@ -2,11 +2,11 @@ package handler
 
 import (
 	"context"
+	"database/sql"
 	z "github.com/entere/parrot/basic/zap"
 	um "github.com/entere/parrot/user-srv/model/user"
-	"go.uber.org/zap"
-
 	user "github.com/entere/parrot/user-srv/proto/user"
+	"go.uber.org/zap"
 )
 
 var (
@@ -27,9 +27,35 @@ func Init() {
 
 type Service struct{}
 
-func (s *Service) UpdatePassword(ctx context.Context, req *user.UpdatePasswordRequest, rsp *user.UpdatePasswordResponse) error {
+func (s *Service) GetUser(ctx context.Context, req *user.GetUserRequest, rsp *user.GetUserResponse) error {
+	// time.Sleep(time.Second * 2)
+	var code int32
+	userData, err := userService.GetUser(req.UserID)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			code = 404
+			log.Info("[GetUser] 用户不存在 userID:"+req.UserID, zap.Any("err", err))
+		} else {
+			code = 500
+			log.Warn("[GetUser] 查询失败 userID:"+req.UserID, zap.Any("err", err))
+		}
+		rsp.Error = &user.Error{
+			Code: code,
+			Msg:  err.Error(),
+		}
+		return err
+	}
+	rsp.Error = &user.Error{
+		Code: 200,
+		Msg:  "Success",
+	}
+	rsp.Data = userData
+	return nil
+}
 
-	err := userService.UpdatePassword(req.Password, req.UserID)
+func (s *Service) UpdateUser(ctx context.Context, req *user.UpdateUserRequest, rsp *user.UpdateUserResponse) error {
+
+	err := userService.UpdateUser(req)
 	if err != nil {
 
 		rsp.Error = &user.Error{
@@ -40,7 +66,7 @@ func (s *Service) UpdatePassword(ctx context.Context, req *user.UpdatePasswordRe
 	}
 	rsp.Error = &user.Error{
 		Code: 200,
-		Msg:  "success",
+		Msg:  "Success",
 	}
 
 	return nil

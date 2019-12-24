@@ -37,7 +37,10 @@ type AuthService interface {
 	MakeAccessToken(ctx context.Context, in *MakeTokenRequest, opts ...client.CallOption) (*MakeTokenResponse, error)
 	DelUserAccessToken(ctx context.Context, in *DelTokenRequest, opts ...client.CallOption) (*DelTokenResponse, error)
 	GetCachedAccessToken(ctx context.Context, in *GetCachedTokenRequest, opts ...client.CallOption) (*GetCachedTokenResponse, error)
-	QueryUserByName(ctx context.Context, in *QueryUserRequest, opts ...client.CallOption) (*QueryUserResponse, error)
+	// 使用用户名密码登录
+	LoginByName(ctx context.Context, in *LoginByNameRequest, opts ...client.CallOption) (*LoginByNameResponse, error)
+	// 更新密码
+	UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, opts ...client.CallOption) (*UpdatePasswordResponse, error)
 }
 
 type authService struct {
@@ -88,9 +91,19 @@ func (c *authService) GetCachedAccessToken(ctx context.Context, in *GetCachedTok
 	return out, nil
 }
 
-func (c *authService) QueryUserByName(ctx context.Context, in *QueryUserRequest, opts ...client.CallOption) (*QueryUserResponse, error) {
-	req := c.c.NewRequest(c.name, "Auth.QueryUserByName", in)
-	out := new(QueryUserResponse)
+func (c *authService) LoginByName(ctx context.Context, in *LoginByNameRequest, opts ...client.CallOption) (*LoginByNameResponse, error) {
+	req := c.c.NewRequest(c.name, "Auth.LoginByName", in)
+	out := new(LoginByNameResponse)
+	err := c.c.Call(ctx, req, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *authService) UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, opts ...client.CallOption) (*UpdatePasswordResponse, error) {
+	req := c.c.NewRequest(c.name, "Auth.UpdatePassword", in)
+	out := new(UpdatePasswordResponse)
 	err := c.c.Call(ctx, req, out, opts...)
 	if err != nil {
 		return nil, err
@@ -104,7 +117,10 @@ type AuthHandler interface {
 	MakeAccessToken(context.Context, *MakeTokenRequest, *MakeTokenResponse) error
 	DelUserAccessToken(context.Context, *DelTokenRequest, *DelTokenResponse) error
 	GetCachedAccessToken(context.Context, *GetCachedTokenRequest, *GetCachedTokenResponse) error
-	QueryUserByName(context.Context, *QueryUserRequest, *QueryUserResponse) error
+	// 使用用户名密码登录
+	LoginByName(context.Context, *LoginByNameRequest, *LoginByNameResponse) error
+	// 更新密码
+	UpdatePassword(context.Context, *UpdatePasswordRequest, *UpdatePasswordResponse) error
 }
 
 func RegisterAuthHandler(s server.Server, hdlr AuthHandler, opts ...server.HandlerOption) error {
@@ -112,7 +128,8 @@ func RegisterAuthHandler(s server.Server, hdlr AuthHandler, opts ...server.Handl
 		MakeAccessToken(ctx context.Context, in *MakeTokenRequest, out *MakeTokenResponse) error
 		DelUserAccessToken(ctx context.Context, in *DelTokenRequest, out *DelTokenResponse) error
 		GetCachedAccessToken(ctx context.Context, in *GetCachedTokenRequest, out *GetCachedTokenResponse) error
-		QueryUserByName(ctx context.Context, in *QueryUserRequest, out *QueryUserResponse) error
+		LoginByName(ctx context.Context, in *LoginByNameRequest, out *LoginByNameResponse) error
+		UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, out *UpdatePasswordResponse) error
 	}
 	type Auth struct {
 		auth
@@ -137,6 +154,10 @@ func (h *authHandler) GetCachedAccessToken(ctx context.Context, in *GetCachedTok
 	return h.AuthHandler.GetCachedAccessToken(ctx, in, out)
 }
 
-func (h *authHandler) QueryUserByName(ctx context.Context, in *QueryUserRequest, out *QueryUserResponse) error {
-	return h.AuthHandler.QueryUserByName(ctx, in, out)
+func (h *authHandler) LoginByName(ctx context.Context, in *LoginByNameRequest, out *LoginByNameResponse) error {
+	return h.AuthHandler.LoginByName(ctx, in, out)
+}
+
+func (h *authHandler) UpdatePassword(ctx context.Context, in *UpdatePasswordRequest, out *UpdatePasswordResponse) error {
+	return h.AuthHandler.UpdatePassword(ctx, in, out)
 }
